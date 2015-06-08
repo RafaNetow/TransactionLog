@@ -21,8 +21,11 @@ namespace TransactionLog
         private void button1_Click(object sender, EventArgs e)
         {
             ManagerLog Manager = new ManagerLog();
+            var Result = Manager.ShearchTable("as");
+            this.dataGridView1.DataSource = Result.SelectResult;
 
-          
+
+
         }
 
         
