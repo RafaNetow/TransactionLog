@@ -15,7 +15,8 @@ namespace TransactionLog.Clases
      class ManagerLog
      {
          public static Resultado ManagerResult;
-         public ManagerLog()
+         public SqlConnection connection;
+         public ManagerLog(string dataBase , string Table)
          {
               ManagerResult = new Resultado();
          }
@@ -27,9 +28,7 @@ namespace TransactionLog.Clases
             //This function is to put the connectionString in mode Window Autentication 
             
             SqlConnection sqlConnection = new SqlConnection("Data Source=(localdb)\\ProjectsV12;Initial Catalog=CHF_DEV;Integrated Security=SSPI;");
-            //SqlConnection sqlConnection3 = new SqlConnection("Provider=System.Data.SqlClient;Server=myServerAddress;Database=myDataBase;Trusted_Connection=yes");
-           // SqlConnection sqlConnection2 = new SqlConnection(" Server=localdb;Database=CHF_DEV;IntegratedSecurity=yes;Uid=auth_windows;");
-            //SqlConnection sqlConnection = new SqlConnection(" name=NorthwindContex ;connectionString=data source=localhost;initial catalog=northwind;persist security info=True; Integrated Security=SSPI; providerName=System.Data.SqlClient" );
+           
            
             var dataTable = new DataTable();
              sqlConnection.Open();
@@ -65,7 +64,21 @@ namespace TransactionLog.Clases
             
             return new Resultado();
         }
-    }
+        public SqlDataReader GetRowLogContents0(string tableName)
+        {
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = "SELECT [Begin Time] FROM ::fn_dblog(NULL,NULL)  where AllocUnitName = 'dbo." + tableName;
+            cmd.CommandType = CommandType.Text;
+            cmd.Connection = connection;
+            SqlDataReader reader = cmd.ExecuteReader();
+            if (reader.HasRows)
+                return reader;
+            return null;
+        }
+
+     
+     
+     }
 
 
 }
