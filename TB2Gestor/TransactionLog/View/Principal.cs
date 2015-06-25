@@ -16,6 +16,9 @@ namespace TransactionLog
         private ListBox listBoxTable;
         private Label label3;
         private Label label1;
+        private DataGridViewTextBoxColumn ID_Transaction;
+        private DataGridViewTextBoxColumn Fecha_Hora;
+        private DataGridViewTextBoxColumn RolowContent;
         
         
         /// <summary>
@@ -44,14 +47,14 @@ namespace TransactionLog
         /// </summary>
         private void InitializeComponent()
         {
-
-            
-            
             this.button1 = new System.Windows.Forms.Button();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.listBoxTable = new System.Windows.Forms.ListBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
+            this.ID_Transaction = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Fecha_Hora = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.RolowContent = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -68,10 +71,15 @@ namespace TransactionLog
             // dataGridView1
             // 
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.ID_Transaction,
+            this.Fecha_Hora,
+            this.RolowContent});
             this.dataGridView1.Location = new System.Drawing.Point(169, 160);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.Size = new System.Drawing.Size(526, 143);
             this.dataGridView1.TabIndex = 3;
+            this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             // 
             // listBoxTable
             // 
@@ -99,6 +107,21 @@ namespace TransactionLog
             this.label1.Size = new System.Drawing.Size(155, 13);
             this.label1.TabIndex = 8;
             this.label1.Text = "Transaction Log RowContent 0";
+            // 
+            // ID_Transaction
+            // 
+            this.ID_Transaction.HeaderText = "ID_Transaction";
+            this.ID_Transaction.Name = "ID_Transaction";
+            // 
+            // Fecha_Hora
+            // 
+            this.Fecha_Hora.HeaderText = "Fecha y Hora";
+            this.Fecha_Hora.Name = "Fecha_Hora";
+            // 
+            // RolowContent
+            // 
+            this.RolowContent.HeaderText = "Row Log Content";
+            this.RolowContent.Name = "RolowContent";
             // 
             // Principal
             // 
@@ -140,9 +163,8 @@ namespace TransactionLog
 
         private void button1_Click(object sender, EventArgs e)
         {
-            ManagerLog Manager = new ManagerLog();
-            var Result = Manager.ShearchTable("as");
-            this.dataGridView1.DataSource = Result.SelectResult;
+            if (listBoxTable.Text.Length == 0)
+                MessageBox.Show("Seleccione una tabla", "Error", MessageBoxButtons.OK);
 
 
 
@@ -154,6 +176,11 @@ namespace TransactionLog
         }
 
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
 
         }
