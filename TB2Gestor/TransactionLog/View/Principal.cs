@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using TransactionLog.Clases;
@@ -8,8 +9,8 @@ namespace TransactionLog
 {
     public class Principal : Form
     {
-
-        public ManagerLog manager = new ManagerLog();
+        public ManagerConverter managerConvert = new ManagerConverter();
+        public ManagerLog managerLog = new ManagerLog();
 
 
 
@@ -160,7 +161,7 @@ namespace TransactionLog
         {
             InitializeComponent();
 
-            var tables = this.manager.GetTables();
+            var tables = this.managerLog.GetTables();
 
             while (tables.Read())
             {
@@ -176,7 +177,7 @@ namespace TransactionLog
                 MessageBox.Show("Seleccione una tabla", "Error", MessageBoxButtons.OK);
             else
             {
-                var rowLogInformation = manager.GetRowLogContents0Information(listBoxTable.Text);
+                var rowLogInformation = managerLog.GetRowLogContents0Information(listBoxTable.Text);
                 if (rowLogInformation != null)
                 {
                     while (rowLogInformation.Read())
@@ -184,9 +185,89 @@ namespace TransactionLog
                         var transactionId = rowLogInformation.GetString(0);
                         DataGridViewRow row = (DataGridViewRow) this.dataGridView1.Rows[0].Clone();
                         row.Cells[0].Value = transactionId;
+                        long len = rowLogInformation.GetBytes(1, 0, null, 0, 0);
+                         byte[] buffer = new byte[len];
+                         rowLogInformation.GetBytes(1,0,buffer,0,(int)len);
+                         var arrayHex = managerConvert.ByteArrayToString(buffer);
+                         row.Cells[2].Value = "0X" + arrayHex;
+                         var fixedColumns = arrayHex.Substring(4, 4);
+                         var where = 8;
+                         for (int i = 3; i < dataGridView1.Columns.Count; i++)
+                         {
+                             var hexSubstring = "";
+                             var hexInverted = "";
+                             if (where > Int32.Parse(fixedColumns, NumberStyles.AllowHexSpecifier)+8)
+                                 break;
+                             var columnType = dataGridView1.Rows[dataGridView1.Rows.Count-1].Cells[i].Value.ToString();
+                             switch (columnType)
+                             {
+                                 case "int": 
+                                     hexSubstring = arrayHex.Substring(where, 8);
+                                     hexInverted = managerConvert.InvertHexadecimal(hexSubstring);
+                                     row.Cells[i].Value = managerConvert.HexToInt(hexInverted);
+                                     where = where + 8;
+                                     break;
+                                 case "tinyint":
+                                     hexSubstring = arrayHex.Substring(where, 2);
+                                     row.Cells[i].Value = managerConvert.HexToTinyInt(hexSubstring);
+                                     where = where + 2;
+                                     break;
+                                 case "bigint":
+                                     hexSubstring = arrayHex.Substring(where, 16);
+                                     hexInverted = managerConvert.InvertHexadecimal(hexSubstring);
+                                     row.Cells[i].Value = managerConvert.HexToBigInt(hexInverted);
+                                     where = where + 16;
+                                     break;
+                                 case "float":
+                                     hexSubstring = arrayHex.Substring(where, 16);
+                                     hexInverted = managerConvert.InvertHexadecimal(hexSubstring);
+                                     row.Cells[i].Value = managerConvert.HexToFloat(hexInverted);
+                                     where = where + 16;
+                                     break;
+                                 case "money":
+                                     hexSubstring = arrayHex.Substring(where, 16);
+                                     hexInverted = managerConvert.InvertHexadecimal(hexSubstring);
+                                     row.Cells[i].Value = managerConvert.HexToMoney(hexInverted);
+                                     where = where + 16;
+                                     break;
+                                 case "real":
+                                     hexSubstring = arrayHex.Substring(where, 8);
+                                     hexInverted = managerConvert.InvertHexadecimal(hexSubstring);
+                                     row.Cells[i].Value = managerConvert.HexToReal(hexInverted);
+                                     where = where + 8;
+                                     break;
+                                 case "datetime":
+                                     hexSubstring = arrayHex.Substring(where, 16);
+                                     hexInverted = managerConvert.InvertHexadecimal(hexSubstring);
+                                     row.Cells[i].Value = managerConvert.HexToDateTime(hexInverted);
+                                     where = where + 16;
+                                     break;
+                                 case "smalldatetime":
+                                     hexSubstring = arrayHex.Substring(where, 8);
+                                     hexInverted = managerConvert.InvertHexadecimal(hexSubstring);
+                                     row.Cells[i].Value = managerConvert.HexToSmallDateTime(hexInverted);
+                                     where = where + 8;
+                                     break;
+                                 case "bit":
+                                     hexSubstring = arrayHex.Substring(where, 2);
+                                     hexInverted = managerConvert.InvertHexadecimal(hexSubstring);
+                                     row.Cells[i].Value = managerConvert.HexToBit(hexInverted);
+                                     where = where + 2;
+                                     break;
+                                 default:
+                                     row.Cells[i].Value = 0;
+                                     where = where + 4;
+                                     break;
+                             }
+                         }
+                         dataGridView1.Rows.Add(row);
+                     }
+                    
+                     rowLogInformation.Close();
+                 
 
 
-                    }
+                    
 
 
                 }
@@ -217,7 +298,7 @@ namespace TransactionLog
                 }
 
 
-                var columns = manager.GetColumns(listBoxTable.Text);
+                var columns = managerLog.GetColumns(listBoxTable.Text);
                 if (columns != null)
                 {
                     while (columns.Read())
@@ -228,7 +309,7 @@ namespace TransactionLog
                     columns.Close();
                 }
 
-                var columnsType = manager.GetColumns(listBoxTable.Text);
+                var columnsType = managerLog.GetColumns(listBoxTable.Text);
                 dataGridView1.Rows[0].Cells["ID_Transaction"].Value = "int";
                 dataGridView1.Rows[0].Cells["Fecha_Hora"].Value = "datetime2";
                 dataGridView1.Rows[0].Cells["RoLowContent"].Value = "hex";

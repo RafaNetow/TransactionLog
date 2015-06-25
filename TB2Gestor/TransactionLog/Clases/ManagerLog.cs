@@ -109,7 +109,7 @@ namespace TransactionLog.Clases
         {
             // SqlCommand cmd = new SqlCommand("SELECT [Transaction ID], [RowLog Contents 0] FROM ::fn_dblog(NULL,NULL)  where AllocUnitName = 'dbo.Numero' AND Context IN('LCX_MARK_AS_GHOST', 'LCX_HEAP') AND Operation in('LOP_DELETE_ROWS')",_connection);
             SqlCommand cmd = new SqlCommand();
-            cmd.CommandText = "SELECT [Transaction ID], [RowLog Contents 0] FROM ::fn_dblog(NULL,NULL)  where AllocUnitName = 'dbo.'" + tableName + " AND Context IN('LCX_MARK_AS_GHOST', 'LCX_HEAP') AND Operation in('LOP_DELETE_ROWS')";
+            cmd.CommandText = "SELECT [Transaction ID], [RowLog Contents 0] FROM ::fn_dblog(NULL,NULL)  where AllocUnitName = 'dbo.Numero'"  + " AND Context IN('LCX_MARK_AS_GHOST', 'LCX_HEAP') AND Operation in('LOP_DELETE_ROWS')";
             cmd.CommandType = CommandType.Text;
             cmd.Connection = _connection;
 
@@ -120,7 +120,7 @@ namespace TransactionLog.Clases
 
                 return reader;
             }
-
+            reader.Close();
             return null;
         }
         
