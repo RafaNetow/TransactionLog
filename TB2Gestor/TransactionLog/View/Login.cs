@@ -14,7 +14,7 @@ namespace TransactionLog.View
 {
     public partial class Login : Form
     {
-        private ManagerLog Manager = new ManagerLog();
+        public ManagerLog Manager = new ManagerLog();
 
         public Login()
         {
@@ -38,7 +38,7 @@ namespace TransactionLog.View
             {
                 this.Hide();
 
-              Login logForm = new Login();
+              Principal logForm = new Principal();
                 logForm.ShowDialog();
             }
         }}

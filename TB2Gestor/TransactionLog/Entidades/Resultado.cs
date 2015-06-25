@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TransactionLog.Entidades
 {
-     class Resultado
+   public  class Resultado
     {
          public string response { get; set; }
          public DataTable SelectResult{ get; set; }

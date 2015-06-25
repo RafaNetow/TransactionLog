@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
@@ -12,17 +13,17 @@ using TransactionLog.Entidades;
 
 namespace TransactionLog.Clases
 {
-     class ManagerLog
+    public  class ManagerLog
      {
-         public static Resultado ManagerResult;
-         public SqlConnection _connection;
+         public  Resultado ManagerResult;
+        public static SqlConnection _connection;
          public ManagerLog()
          {
               ManagerResult = new Resultado();
          }
 
-
-         public  SqlConnection SetConnectioString(string server, string dbName)
+        //Obtengo la Connecion con el Server y La base de datos indicada
+           public  SqlConnection SetConnectioString(string server, string dbName)
          {
               string dataSource = "Data Source=" + server + ";";
             string catalog = "Initial Catalog=" + dbName + ";";
@@ -43,20 +44,36 @@ namespace TransactionLog.Clases
             }
         }
 
-         
-        
+        //Obtengo todas las tablas de la base de datos en la cual estoy
+         public SqlDataReader GetTables()
+         {
+            
+             _connection.Close();
+             _connection.Open();
+             SqlCommand cmd = new SqlCommand("SELECT name FROM sysobjects WHERE type='U'",_connection);
+             
+            
+           //  cmd.CommandText = "SELECT name FROM sysobjects WHERE type='U'";
+             //cmd.CommandType = CommandType.Text;
+             //cmd.Connection = _connection;
+             
+             SqlDataReader reader = cmd.ExecuteReader();
+             if (reader.HasRows)
+                 return reader;
+             return null;
+         }
 
 
         public  Resultado ShearchTable(string Table)
         {
             //This function is to put the connectionString in mode Window Autentication 
             
-            SqlConnection sqlConnection = new SqlConnection("Data Source=(localdb)\\ProjectsV12;Initial Catalog=CHF_DEV;Integrated Security=SSPI;");
+           
            
            
             var dataTable = new DataTable();
-             sqlConnection.Open();
-             SqlCommand myCommand = new SqlCommand("Select* From fn_dblog(null, null)",sqlConnection);
+             _connection.Open();
+             SqlCommand myCommand = new SqlCommand("Select* From fn_dblog(null, null)",_connection);
 
              SqlDataReader myReader;
             try
@@ -78,7 +95,7 @@ namespace TransactionLog.Clases
                
                 
             }
-            sqlConnection.Close();
+            _connection.Close();
 
             return ManagerResult;
         }
@@ -90,10 +107,12 @@ namespace TransactionLog.Clases
         }
         public SqlDataReader GetRowLogContents0(string tableName)
         {
+            _connection.Open();
             SqlCommand cmd = new SqlCommand();
             cmd.CommandText = "SELECT [Begin Time] FROM ::fn_dblog(NULL,NULL)  where AllocUnitName = 'dbo." + tableName;
             cmd.CommandType = CommandType.Text;
             cmd.Connection = _connection;
+            
             SqlDataReader reader = cmd.ExecuteReader();
             if (reader.HasRows)
                 return reader;
