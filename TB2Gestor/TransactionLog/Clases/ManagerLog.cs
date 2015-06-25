@@ -15,11 +15,35 @@ namespace TransactionLog.Clases
      class ManagerLog
      {
          public static Resultado ManagerResult;
-         public SqlConnection connection;
-         public ManagerLog(string dataBase , string Table)
+         public SqlConnection _connection;
+         public ManagerLog()
          {
               ManagerResult = new Resultado();
          }
+
+
+         public  SqlConnection SetConnectioString(string server, string dbName)
+         {
+              string dataSource = "Data Source=" + server + ";";
+            string catalog = "Initial Catalog=" + dbName + ";";
+            string type = "Integrated Security=True";
+            try
+            {
+                
+                
+                    _connection = new SqlConnection(dataSource + catalog + type);
+                
+                    
+                _connection.Open();
+                return _connection;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+         
         
 
 
@@ -69,14 +93,14 @@ namespace TransactionLog.Clases
             SqlCommand cmd = new SqlCommand();
             cmd.CommandText = "SELECT [Begin Time] FROM ::fn_dblog(NULL,NULL)  where AllocUnitName = 'dbo." + tableName;
             cmd.CommandType = CommandType.Text;
-            cmd.Connection = connection;
+            cmd.Connection = _connection;
             SqlDataReader reader = cmd.ExecuteReader();
             if (reader.HasRows)
                 return reader;
             return null;
         }
 
-     
+   
      
      }
 
