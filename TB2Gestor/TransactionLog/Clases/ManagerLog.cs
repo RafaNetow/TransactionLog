@@ -105,6 +105,25 @@ namespace TransactionLog.Clases
             
             return new Resultado();
         }
+        public SqlDataReader GetRowLogContents0Information(string tableName)
+        {
+            // SqlCommand cmd = new SqlCommand("SELECT [Transaction ID], [RowLog Contents 0] FROM ::fn_dblog(NULL,NULL)  where AllocUnitName = 'dbo.Numero' AND Context IN('LCX_MARK_AS_GHOST', 'LCX_HEAP') AND Operation in('LOP_DELETE_ROWS')",_connection);
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = "SELECT [Transaction ID], [RowLog Contents 0] FROM ::fn_dblog(NULL,NULL)  where AllocUnitName = 'dbo.'" + tableName + " AND Context IN('LCX_MARK_AS_GHOST', 'LCX_HEAP') AND Operation in('LOP_DELETE_ROWS')";
+            cmd.CommandType = CommandType.Text;
+            cmd.Connection = _connection;
+
+            SqlDataReader reader = cmd.ExecuteReader();
+            if (reader.HasRows)
+            {
+                MessageBox.Show("Entro reader", "Correcto", MessageBoxButtons.OK);
+
+                return reader;
+            }
+
+            return null;
+        }
+        
         public SqlDataReader GetRowLogContents0(string tableName)
         {
             _connection.Open();
@@ -119,8 +138,19 @@ namespace TransactionLog.Clases
             return null;
         }
 
-   
-     
+
+        public SqlDataReader GetColumns(string tableName)
+        {
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandText = "SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '" + tableName + "'";
+            cmd.CommandType = CommandType.Text;
+            cmd.Connection = _connection;
+
+            SqlDataReader reader = cmd.ExecuteReader();
+            if (reader.HasRows)
+                return reader;
+            return null;
+        }
      }
 
 

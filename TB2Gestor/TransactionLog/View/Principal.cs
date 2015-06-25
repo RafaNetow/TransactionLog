@@ -8,7 +8,7 @@ namespace TransactionLog
 {
     public class Principal : Form
     {
-        
+
         public ManagerLog manager = new ManagerLog();
 
 
@@ -19,8 +19,8 @@ namespace TransactionLog
         private DataGridViewTextBoxColumn ID_Transaction;
         private DataGridViewTextBoxColumn Fecha_Hora;
         private DataGridViewTextBoxColumn RolowContent;
-        
-        
+
+
         /// <summary>
         /// Required designer variable.
         /// </summary>
@@ -55,7 +55,7 @@ namespace TransactionLog
             this.ID_Transaction = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Fecha_Hora = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.RolowContent = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize) (this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
             // button1
@@ -70,16 +70,20 @@ namespace TransactionLog
             // 
             // dataGridView1
             // 
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.ID_Transaction,
-            this.Fecha_Hora,
-            this.RolowContent});
+            this.dataGridView1.ColumnHeadersHeightSizeMode =
+                System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[]
+            {
+                this.ID_Transaction,
+                this.Fecha_Hora,
+                this.RolowContent
+            });
             this.dataGridView1.Location = new System.Drawing.Point(169, 160);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.Size = new System.Drawing.Size(526, 143);
             this.dataGridView1.TabIndex = 3;
-            this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
+            this.dataGridView1.CellContentClick +=
+                new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             // 
             // listBoxTable
             // 
@@ -136,10 +140,15 @@ namespace TransactionLog
             this.Name = "Principal";
             this.Text = "TransactionLog";
             this.Load += new System.EventHandler(this.Principal_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize) (this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
+        }
+
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
@@ -165,8 +174,23 @@ namespace TransactionLog
         {
             if (listBoxTable.Text.Length == 0)
                 MessageBox.Show("Seleccione una tabla", "Error", MessageBoxButtons.OK);
+            else
+            {
+                var rowLogInformation = manager.GetRowLogContents0Information(listBoxTable.Text);
+                if (rowLogInformation != null)
+                {
+                    while (rowLogInformation.Read())
+                    {
+                        var transactionId = rowLogInformation.GetString(0);
+                        DataGridViewRow row = (DataGridViewRow) this.dataGridView1.Rows[0].Clone();
+                        row.Cells[0].Value = transactionId;
 
 
+                    }
+
+
+                }
+            }
 
         }
 
@@ -175,14 +199,54 @@ namespace TransactionLog
 
         }
 
+        
+
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
+            {
+                var columnsAmount = this.dataGridView1.Columns.Count;
+                if (columnsAmount > 3)
+                {
+                    for (int deletColumns = columnsAmount - 1; deletColumns <= columnsAmount; deletColumns--)
+                    {
+                        if (deletColumns == 2)
+                            break;
+                        dataGridView1.Columns.RemoveAt(deletColumns);
+                    }
+                    dataGridView1.Refresh();
+                }
 
-        }
 
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
+                var columns = manager.GetColumns(listBoxTable.Text);
+                if (columns != null)
+                {
+                    while (columns.Read())
+                    {
+                        var content = columns.GetString(0);
+                        dataGridView1.Columns.Add(content, content);
+                    }
+                    columns.Close();
+                }
 
+                var columnsType = manager.GetColumns(listBoxTable.Text);
+                dataGridView1.Rows[0].Cells["ID_Transaction"].Value = "int";
+                dataGridView1.Rows[0].Cells["Fecha_Hora"].Value = "datetime2";
+                dataGridView1.Rows[0].Cells["RoLowContent"].Value = "hex";
+                int posColumns = 0;
+                if (columnsType != null)
+                {
+                    while (columnsType.Read())
+                    {
+                        var content = columnsType.GetString(0);
+
+                        var contentType = columnsType.GetString(1);
+                        dataGridView1.Rows[0].Cells[content].Value = contentType;
+                        posColumns++;
+                    }
+                    columnsType.Close();
+                }
+
+            }
         }
     }
 }
